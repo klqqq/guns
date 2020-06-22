@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.RentShopsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.RentShops">
+        <id column="bid" property="bid" />
+        <result column="fid" property="fid" />
+        <result column="shops_id" property="shopsId" />
+        <result column="shops_name" property="shopsName" />
+        <result column="shops_number" property="shopsNumber" />
+        <result column="shops_area" property="shopsArea" />
+        <result column="business_type" property="businessType" />
+        <result column="address" property="address" />
+        <result column="contract_fees" property="contractFees" />
+        <result column="property_fees" property="propertyFees" />
+        <result column="business_fees" property="businessFees" />
+        <result column="monthly_rent" property="monthlyRent" />
+        <result column="paid_rent" property="paidRent" />
+        <result column="lease_status" property="leaseStatus" />
+        <result column="memo" property="memo" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="user_id" property="userId" />
+        <result column="manage_id" property="manageId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        bid, fid, shops_id, shops_name, shops_number, shops_area, business_type, address, contract_fees, property_fees, business_fees, monthly_rent, paid_rent, lease_status, memo, created_at, updated_at, user_id, manage_id
+    </sql>
+
+    <select id="getShops" resultType="map">
+        select a.bid, (select fullname from sys_dept where id=a.bid) as bname ,
+        a.fid, (select simplename from sys_dept where id=a.fid) as fname,
+        a.shops_id as shopsId, a.shops_name as shopsName, a.shops_number as shopsNumber, a.shops_area as shopsArea, a.business_type as businessType,
+        a.address, a.contract_fees as contractFees, a.property_fees as propertyFees, a.business_fees as businessFees, a.monthly_rent as monthlyRent,
+        a.paid_rent as paidRent,
+        case when a.lease_status=1 then '未出租' else '已出租' end as leaseStatus,
+        a.memo, a.created_at as createdAt, a.updated_at as updatedAt,
+        a.user_id as userId, (select name from sys_user where id=a.user_id) as userName, a.manage_id as manageId, b.name as manageName
+        from rent_shops a, sys_user b
+        where a.manage_id=b.id and ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))
+        <if test="condition1 != null and condition1 != ''">
+            and (select fullname from sys_dept where id=a.bid) like CONCAT('%',#{condition1},'%')
+        </if>
+        <if test="condition2 != null and condition2 != ''">
+            and (select simplename from sys_dept where id=a.fid) like CONCAT('%',#{condition2},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.created_at >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.created_at)
+        </if>
+        order by a.shops_number, a.created_at
+    </select>
+
+    <delete id="deleteShops">
+        delete from rent_shops where bid=#{bid} and fid=#{fid} and shops_id=#{shopsId}
+    </delete>
+
+    <insert id="addShops">
+        insert into rent_shops(bid, fid, shops_id, shops_name, shops_number, shops_area, business_type, contract_fees, property_fees, business_fees, monthly_rent, paid_rent, lease_status, memo, created_at, updated_at, user_id, manage_id)
+        values(#{bid},#{fid},#{shopsId},#{shopsName},#{shopsNumber},#{shopsArea},#{businessType},#{contractFees},#{propertyFees},#{businessFees},#{monthlyRent},#{paidRent},#{leaseStatus},#{memo},#{createdAt},#{updatedAt},#{userId},#{manageId})
+    </insert>
+
+    <select id="maxShopsNum" resultType="Integer">
+        select max(shops_id) from rent_shops where bid=#{bid} and fid=#{fid}
+    </select>
+
+    <update id="setShops">
+        update rent_shops set bid=#{rentShops.bid},fid=#{rentShops.fid},shops_id=#{rentShops.shopsId},shops_name=#{rentShops.shopsName},
+        shops_number=#{rentShops.shopsNumber},shops_area=#{rentShops.shopsArea},
+        business_type=#{rentShops.businessType},contract_fees=#{rentShops.contractFees},
+        property_fees=#{rentShops.propertyFees},business_fees=#{rentShops.businessFees},monthly_rent=#{rentShops.monthlyRent},paid_rent=#{rentShops.paidRent},
+        lease_status=#{rentShops.leaseStatus},memo=#{rentShops.memo},updated_at=#{rentShops.updatedAt}, manage_id=#{rentShops.manageId}
+        where bid=#{bid1} and fid=#{fid1} and shops_id=#{shopsId1}
+    </update>
+
+    <select id="getShopsById" resultType="cn.stylefeng.guns.modular.system.model.RentShops">
+        select a.bid, a.fid,
+        a.shops_id as shopsId, a.shops_name as shopsName, a.shops_number as shopsNumber, a.shops_area as shopsArea, a.business_type as businessType,
+        a.address, a.contract_fees as contractFees, a.property_fees as propertyFees, a.business_fees as businessFees, a.monthly_rent as monthlyRent,
+        a.paid_rent as paidRent,
+        a.lease_status as leaseStatus, a.memo, a.created_at as createdAt, a.updated_at as updatedAt, a.user_id as userId, a.manage_id as manageId
+        from rent_shops a
+        where a.bid=#{bid} and a.fid=#{fid} and a.shops_id=#{shopsId}
+    </select>
+
+    <select id="getIdByShopsNumber" resultType="Integer">
+        select shops_id from rent_shops where bid=#{bid} and fid=#{fid} and shops_number=#{shopsNumber}
+    </select>
+
+    <select id="getShopsNumber" resultType="map">
+        select shops_id, shops_number from rent_shops where bid=#{bid} and fid=#{fid}
+    </select>
+
+    <select id="getShopsNumber2" resultType="map">
+        select shops_id, shops_number from rent_shops where bid=#{bid} and fid=#{fid}
+        and shops_id not in (select shops_id from rent_shop_contract_details where bid=#{bid} and fid=#{fid} and flag=0)
+    </select>
+
+    <update id="setStatus">
+        update rent_shops set lease_status=2 where bid=#{bid} and fid=#{fid} and shops_number=#{shopsNumber}
+    </update>
+
+</mapper>

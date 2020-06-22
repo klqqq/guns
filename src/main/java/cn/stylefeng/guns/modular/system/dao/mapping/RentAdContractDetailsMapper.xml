@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.RentAdContractDetailsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.RentAdContractDetails">
+        <id column="id" property="id" />
+        <result column="tenants_id" property="tenantsId" />
+        <result column="card_number" property="cardNumber" />
+        <result column="bid" property="bid" />
+        <result column="fid" property="fid" />
+        <result column="ad_number" property="adNumber" />
+        <result column="ad_id" property="adId" />
+        <result column="deposit" property="deposit" />
+        <result column="payment" property="payment" />
+        <result column="period" property="period" />
+        <result column="rent_status" property="rentStatus" />
+        <result column="electricity_type" property="electricityType" />
+        <result column="electricity_price" property="electricityPrice" />
+        <result column="contract_fees" property="contractFees" />
+        <result column="contract_margin" property="contractMargin" />
+        <result column="property_margin" property="propertyMargin" />
+        <result column="property_fees" property="propertyFees" />
+        <result column="business_margin" property="businessMargin" />
+        <result column="business_fees" property="businessFees" />
+        <result column="water_margin" property="waterMargin" />
+        <result column="begined_at" property="beginedAt" />
+        <result column="ended_at" property="endedAt" />
+        <result column="contract_pic" property="contractPic" />
+        <result column="lease_memo" property="leaseMemo" />
+        <result column="user_id" property="userId" />
+        <result column="flag" property="flag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, tenants_id, card_number, bid, fid, ad_number, ad_id, deposit, payment, period, rent_status, electricity_type, electricity_price, contract_fees, contract_margin, property_margin, property_fees, business_margin, business_fees, water_margin, begined_at, ended_at, contract_pic, lease_memo, user_id, flag
+    </sql>
+
+    <select id="getAdContract" resultType="map">
+        select a.id, a.tenants_id as tenantsId, (select name from rent_tenants where tenants_id=a.tenants_id) as tenantsName, a.card_number as cardNumber,
+        a.bid, (select fullname from sys_dept where id=a.bid) as bname ,
+        a.fid, (select simplename from sys_dept where id=a.fid) as fname, a.ad_id as adId, a.ad_number as adNumber,
+        (select ad_name from rent_ad_bit where bid=a.bid and fid=a.fid and ad_id=a.ad_id) as adName,
+        a.deposit, a.payment,CONCAT('押',a.deposit,'付',a.payment) as dap, a.period,
+        case when a.rent_status=1 then '新租' else '续租' end as rentStatus, case when a.electricity_type=1 then '独立抄表' else '核定用电量' end as electricityType,
+        a.electricity_price as electricityPrice, a.contract_fees as contractFees, a.contract_margin as contractMargin, a.property_margin as propertyMargin,
+        a.property_fees as propertyFees, a.business_margin as businessMargin, a.business_fees as businessFees, a.water_margin as waterMargin,
+        a.begined_at as beginedAt, a.ended_at as endedAt, a.contract_pic as contractPic, a.lease_memo as leaseMemo,
+        a.user_id as userId, (select name from sys_user where id=a.user_id ) as userName,
+        case when a.flag=0 then '未终止' else '已终止' end as flag
+        from rent_ad_contract_details a, sys_user b, rent_ad_bit c
+        where a.bid=c.bid and a.fid=c.fid and a.ad_id=c.ad_id and b.id=c.manage_id and
+        ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))
+        <if test="condition1 != null and condition1 != ''">
+            and (select fullname from sys_dept where id=a.bid) like CONCAT('%',#{condition1},'%')
+        </if>
+        <if test="condition2 != null and condition2 != ''">
+            and (select simplename from sys_dept where id=a.fid) like CONCAT('%',#{condition2},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.begined_at >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.ended_at)
+        </if>
+        order by a.flag, a.ended_at
+    </select>
+
+    <delete id="deleteAdContract">
+        delete from rent_ad_contract_details where id=#{id}
+    </delete>
+
+    <insert id="addAdContract">
+        insert into rent_ad_contract_details(tenants_id, card_number, bid, fid, ad_number, ad_id, deposit, payment, period, rent_status, electricity_type,
+        electricity_price, contract_fees, contract_margin, property_margin, property_fees, business_margin, business_fees, water_margin, begined_at, ended_at, contract_pic, lease_memo, user_id, flag)
+        values(#{tenantsId},#{cardNumber},#{bid},#{fid},#{adNumber},#{adId},#{deposit},#{payment},#{period},#{rentStatus},#{electricityType},#{electricityPrice},
+        #{contractFees},#{contractMargin},#{propertyMargin},#{propertyFees},#{businessMargin},#{businessFees},#{waterMargin},#{beginedAt},#{endedAt},#{contractPic},#{leaseMemo},#{userId}, #{flag})
+    </insert>
+
+    <update id="setAdContract">
+        update rent_ad_contract_details set tenants_id=#{tenantsId},card_number=#{cardNumber},bid=#{bid},fid=#{fid},ad_number=#{adNumber},ad_id=#{adId},deposit=#{deposit},
+        payment=#{payment},period=#{period},rent_status=#{rentStatus},electricity_type=#{electricityType},electricity_price=#{electricityPrice},contract_fees=#{contractFees},contract_margin=#{contractMargin},
+        property_margin=#{propertyMargin},property_fees=#{propertyFees},business_margin=#{businessMargin},business_fees=#{businessFees},water_margin=#{waterMargin},
+        begined_at=#{beginedAt},ended_at=#{endedAt},contract_pic=#{contractPic},lease_memo=#{leaseMemo}
+        where id=#{id}
+    </update>
+
+    <select id="getTenantsId" resultType="Integer">
+        select tenants_id from rent_ad_contract_details where bid=#{bid} and fid=#{fid} and ad_number=#{adNumber} and flag=0
+    </select>
+
+    <update id="setFlag">
+        update rent_ad_contract_details set flag=1 where bid=#{bid} and fid=#{fid} and ad_number=#{adNumber}
+    </update>
+
+    <select id="getAdNumber" resultType="map">
+        select ad_id, ad_number from rent_ad_contract_details where bid=#{bid} and fid=#{fid} and flag=0
+    </select>
+</mapper>

@@ -1,0 +1,64 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="rentTenantAdChangeInfoForm">
+            <input type="hidden" id="id" value="">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+
+                            <#select id="bid" name="大楼"  value=""/>
+                            <#select id="fid" name="楼层" value="" />
+                            <#select id="adNumber" name="广告位编号" value="" />
+
+                            <#select id="optionsId" name="变更事项" underline="true" value="0"/>
+
+                            <#input id="changeReason" name="变更选项具体原因" underline="true"/>
+                            <#input id="electricMeter" name="电表读数" underline="true"/>
+                            <#input id="waterMeter" name="水表读数" underline="true"/>
+                            <#input id="offTimes" name="缺勤未关灯次数" underline="true"/>
+                            <#input id="votes" name="钥匙数量" underline="true"/>
+                </div>
+
+                <div class="col-sm-6">
+
+                            <#input id="fitmentPrice" name="装修押金" underline="true"/>
+                            <#input id="garbagePrice" name="垃圾清运费" underline="true"/>
+                            <#input id="platePrice" name="施工号牌费" underline="true"/>
+                            <#input id="popPrice" name="封场POP费" underline="true"/>
+                            <#input id="offPrice" name="缺勤未关灯罚款" underline="true"/>
+                            <#input id="lisensePrice" name="证照押金" underline="true"/>
+                            <#input id="otherPrice" name="其他费用" underline="true"/>
+                            <#input id="memo" name="备注信息" underline="true"/>
+
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="RentTenantAdChangeInfoDlg.addSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="RentTenantAdChangeInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/rentTenantAdChange/rentTenantAdChange_info.js"></script>
+<script>
+    $(function () {
+        var ajax = new $ax(Feng.ctxPath + "/rentTenantSelections/list1", function (data) {
+            var user_list = data;
+            for (var temp in user_list){
+                $("#optionsId").append("<option value='"+user_list[temp].id+"'>"+user_list[temp].options+"</option>");
+            }
+
+        }, function (data) {
+            Feng.error("传参失败!" + data.responseJSON.message + "!");
+        });
+        ajax.start();
+    });
+</script>
+
+
+@}

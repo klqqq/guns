@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.RentShopPaidListMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.RentShopPaidList">
+        <id column="id" property="id" />
+        <result column="tenants_id" property="tenantsId" />
+        <result column="bid" property="bid" />
+        <result column="fid" property="fid" />
+        <result column="shops_number" property="shopsNumber" />
+        <result column="shops_id" property="shopsId" />
+        <result column="paid_cycle" property="paidCycle" />
+        <result column="price" property="price" />
+        <result column="paid_price" property="paidPrice" />
+        <result column="memo" property="memo" />
+        <result column="created_at" property="createdAt" />
+        <result column="user_id" property="userId" />
+        <result column="paid_start" property="paidStart" />
+        <result column="paid_end" property="paidEnd" />
+        <result column="voucher" property="voucher" />
+        <result column="receipt" property="receipt" />
+        <result column="account" property="account" />
+        <result column="flag" property="flag" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, tenants_id, bid, fid, shops_number, shops_id, paid_cycle, price, paid_price, memo, created_at, user_id, paid_start, paid_end, voucher, receipt, account, flag
+    </sql>
+
+    <select id="getShopPaid" resultType="map">
+         select a.id, a.bid, (select fullname from sys_dept where id=a.bid) as bname ,
+        a.fid, (select simplename from sys_dept where id=a.fid) as fname, a.shops_number as shopsNumber, a.shops_id as shopsId,
+        (select shops_name from rent_shops where bid=a.bid and fid=a.fid and shops_id=a.shops_id) as shopsName,
+        a.tenants_id as tenantsId, (select name from rent_tenants where tenants_id=a.tenants_id) as tenantsName,
+        a.paid_cycle as paidCycle, a.price, a.paid_price as paidPrice, a.memo, a.created_at as createdAt,
+        a.user_id as userId, (select name from sys_user where id=a.user_id ) as userName,
+        a.paid_start as paidStart, a.paid_end as paidEnd, a.voucher, a.receipt, a.account,
+        case when a.flag=0 then '未缴清' else '已缴清' end as flag
+        from rent_shop_paid_list a, sys_user b, rent_shops c
+        where a.bid=c.bid and a.fid=c.fid and a.shops_id=c.shops_id and b.id=c.manage_id and
+        ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))
+        <if test="condition1 != null and condition1 != ''">
+            and (select fullname from sys_dept where id=a.bid) like CONCAT('%',#{condition1},'%')
+        </if>
+        <if test="condition2 != null and condition2 != ''">
+            and (select simplename from sys_dept where id=a.fid) like CONCAT('%',#{condition2},'%')
+        </if>
+        <if test="condition3 != null and condition3 != ''">
+            and (select shops_name from rent_shops where bid=a.bid and fid=a.fid and shops_id=a.shops_id) like CONCAT('%',#{condition3},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.paid_start >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.paid_end)
+        </if>
+        order by a.shops_number, a.flag, a.paid_end desc, a.created_at
+    </select>
+
+    <insert id="addShopPaid">
+        insert into rent_shop_paid_list(tenants_id, bid, fid, shops_number, shops_id, price, paid_price, memo, created_at, user_id,
+        paid_start, paid_end, voucher, receipt, account, flag)
+        values(#{tenantsId},#{bid},#{fid},#{shopsNumber},#{shopsId},#{price},#{paidPrice},#{memo},#{createdAt},#{userId},
+         #{paidStart},#{paidEnd},#{voucher},#{receipt},#{account},#{flag})
+    </insert>
+
+    <delete id="deleteShopPaid">
+        delete from rent_shop_paid_list where id=#{id}
+    </delete>
+
+    <update id="setShopPaid">
+        update rent_shop_paid_list set bid=#{bid},fid=#{fid},shops_number=#{shopsNumber},shops_id=#{shopsId},tenants_id=#{tenantsId},price=#{price},
+        paid_price=#{paidPrice},memo=#{memo},paid_start=#{paidStart},paid_end=#{paidEnd},voucher=#{voucher},receipt=#{receipt},account=#{account},flag=#{flag}
+        where id=#{id}
+    </update>
+
+</mapper>

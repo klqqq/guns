@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.RentAdBitMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.RentAdBit">
+        <id column="bid" property="bid" />
+        <result column="fid" property="fid" />
+        <result column="ad_id" property="adId" />
+        <result column="ad_number" property="adNumber" />
+        <result column="ad_name" property="adName" />
+        <result column="ad_area" property="adArea" />
+        <result column="address" property="address" />
+        <result column="lease_status" property="leaseStatus" />
+        <result column="ad_rent" property="adRent" />
+        <result column="ad_margin" property="adMargin" />
+        <result column="ad_electricity" property="adElectricity" />
+        <result column="ad_memo" property="adMemo" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="user_id" property="userId" />
+        <result column="manage_id" property="manageId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        bid, fid, ad_id, ad_number, ad_name, ad_area, address, lease_status, ad_rent, ad_margin, ad_electricity, ad_memo, created_at, updated_at, user_id, manage_id
+    </sql>
+
+    <select id="getAdBit" resultType="map">
+        select a.bid, (select fullname from sys_dept where id=a.bid) as bname ,
+        a.fid, (select simplename from sys_dept where id=a.fid) as fname,
+        a.ad_id as adId, a.ad_number as adNumber, a.ad_name as adName, a.ad_area as adArea, a.address,
+        case when a.lease_status=1 then '未出租' else '已出租' end as leaseStatus, a.ad_rent as adRent, a.ad_margin as adMargin,
+        a.ad_electricity as adElectricity, a.ad_memo as adMemo, a.created_at as createdAt, a.updated_at as updatedAt,
+        a.user_id as userId, (select name from sys_user where id=a.user_id) as userName, a.manage_id as manageId, b.name as manageName
+        from rent_ad_bit a, sys_user b
+        where a.manage_id=b.id and ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))
+        <if test="condition1 != null and condition1 != ''">
+            and (select fullname from sys_dept where id=a.bid) like CONCAT('%',#{condition1},'%')
+        </if>
+        <if test="condition2 != null and condition2 != ''">
+            and (select simplename from sys_dept where id=a.fid) like CONCAT('%',#{condition2},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.created_at >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.created_at)
+        </if>
+        order by a.created_at
+    </select>
+
+    <delete id="deleteAdBit">
+        delete from rent_ad_bit where bid=#{bid} and fid=#{fid} and ad_id=#{adId}
+    </delete>
+
+    <insert id="addAdBit">
+        insert into rent_ad_bit(bid, fid, ad_id, ad_number, ad_name, ad_area, address, lease_status, ad_rent, ad_margin, ad_electricity, ad_memo,created_at,updated_at,user_id, manage_id)
+        values(#{bid},#{fid},#{adId},#{adNumber},#{adName},#{adArea},#{address},#{leaseStatus},#{adRent},#{adMargin},#{adElectricity},#{adMemo},#{createdAt},#{updatedAt},#{userId}, #{manageId})
+    </insert>
+
+    <select id="maxAdNum" resultType="Integer">
+        select max(ad_id) from rent_ad_bit where bid=#{bid} and fid=#{fid}
+    </select>
+
+    <update id="setAdId">
+        update rent_ad_bit set ad_id=#{adId} where bid=#{bid} and fid=#{fid}
+    </update>
+
+    <update id="setAdBit">
+        update rent_ad_bit set bid=#{rentAdBit.bid},fid=#{rentAdBit.fid},ad_id=#{rentAdBit.adId},ad_number=#{rentAdBit.adNumber},ad_name=#{rentAdBit.adName},ad_area=#{rentAdBit.adArea},address=#{rentAdBit.address},lease_status=#{rentAdBit.leaseStatus},
+        ad_rent=#{rentAdBit.adRent},ad_margin=#{rentAdBit.adMargin},ad_electricity=#{rentAdBit.adElectricity},ad_memo=#{rentAdBit.adMemo},updated_at=#{rentAdBit.updatedAt},manage_id=#{rentAdBit.manageId}
+        where bid=#{bid1} and fid=#{fid1} and ad_id=#{adId1}
+    </update>
+
+    <select id="getAdBitById" resultType="cn.stylefeng.guns.modular.system.model.RentAdBit">
+        select a.bid, a.fid,
+        a.ad_id as adId, a.ad_number as adNumber, a.ad_name as adName, a.ad_area as adArea, a.address,
+        a.lease_status as leaseStatus, a.ad_rent as adRent, a.ad_margin as adMargin,
+        a.ad_electricity as adElectricity, a.ad_memo as adMemo, a.created_at as createdAt, a.updated_at as updatedAt, a.manage_id as manageId
+        from rent_ad_bit a
+        where a.bid=#{bid} and a.fid=#{fid} and a.ad_id=#{adId}
+    </select>
+
+    <select id="getIdByAdNumber" resultType="Integer">
+        select ad_id from rent_ad_bit where bid=#{bid} and fid=#{fid} and ad_number=#{adNumber}
+    </select>
+
+    <select id="getAdNumber" resultType="map">
+        select ad_id, ad_number from rent_ad_bit where bid=#{bid} and fid=#{fid}
+    </select>
+
+    <select id="getAdNumber2" resultType="map">
+        select ad_id, ad_number from rent_ad_bit where bid=#{bid} and fid=#{fid}
+        and ad_id not in(select ad_id from rent_ad_contract_details where bid=#{bid} and fid=#{fid} and flag=0)
+    </select>
+
+    <update id="setStatus">
+        update rent_ad_bit set lease_status=2 where bid=#{bid} and fid=#{fid} and ad_number=#{adNumber}
+    </update>
+
+    <!--<select id="getAllAdBit" resultType="map">-->
+        <!--select a.bid, (select fullname from sys_dept where id=a.bid) as bname ,-->
+        <!--a.fid, (select simplename from sys_dept where id=a.fid) as fname,-->
+        <!--a.ad_id as adId, a.ad_number as adNumber, a.ad_name as adName, a.ad_area as adArea, a.address,-->
+        <!--case when a.lease_status=1 then '未出租' else '已出租' end as leaseStatus, a.ad_rent as adRent, a.ad_margin as adMargin,-->
+        <!--a.ad_electricity as adElectricity, a.ad_memo as adMemo, a.created_at as createdAt, a.updated_at as updatedAt,-->
+        <!--a.user_id as userId, (select name from sys_user where id=a.user_id) as userName, a.manage_id as manageId, b.name as manageName-->
+        <!--from rent_ad_bit a, sys_user b-->
+        <!--where a.manage_id=b.id and ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))-->
+        <!--order by a.created_at-->
+    <!--</select>-->
+
+</mapper>

@@ -1,0 +1,81 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="rentTenantShopChangeInfoForm">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <#select id="bid" name="大楼"  value=""/>
+                            <#select id="fid" name="楼层" value="" />
+                            <#select id="shopsNumber" name="商铺门牌号" value="" />
+
+                            <#select id="optionsId" name="变更事项" underline="true" value="0"/>
+
+                            <#input id="changeReason" name="变更选项具体原因" underline="true"/>
+                            <#select id="electricityType" name="电费缴纳类型" underline="true">
+                                <option value="1">独立抄表</option>
+                                <option value="2">核定用电量</option>
+                            </#select>
+                            <#input id="electricityPrice" name="核定电费单价（xx元/月）" underline="true"/>
+                            <#input id="waterPrice" name="核定水费单价（xx元/月）" underline="true"/>
+
+                            <#input id="electricMeter" name="电表读数" underline="true"/>
+                            <#input id="waterMeter" name="水表读数" underline="true"/>
+                            <#input id="contractMargin" name="合同保证金（元）" underline="true"/>
+                            <#input id="propertyMargin" name="物业保证金（元）" underline="true"/>
+                            <#input id="businessMargin" name="商管保证金（元）" underline="true"/>
+                            <#input id="adMargin" name="广告位保证金（元）" underline="true"/>
+                            <#input id="waterMargin" name="水电保证金（元）" underline="true"/>
+                            <#input id="lisensePrice" name="证照押金（元）" underline="true"/>
+                            <#input id="contractFees" name="租金（元）" underline="true"/>
+
+                </div>
+
+                <div class="col-sm-6">
+
+                            <#input id="propertyFees" name="物业管理费（元）" underline="true"/>
+                            <#input id="businessFees" name="商业管理费（元）" underline="true"/>
+                            <#input id="adRent" name="广告位租金（元）" underline="true"/>
+                            <#input id="fitmentPrice" name="装修押金（元）" underline="true"/>
+                            <#input id="garbagePrice" name="垃圾清运费（元）" underline="true"/>
+                            <#input id="platePrice" name="施工号牌费（元）" underline="true"/>
+                            <#input id="popPrice" name="封场POP费（元）" underline="true"/>
+                            <#input id="offPrice" name="缺勤未关灯罚款（元）" underline="true"/>
+                            <#input id="toolPrice" name="工具费（元）" underline="true"/>
+                            <#input id="exitElectricity" name="退场电费（元）" underline="true"/>
+                            <#input id="exitWater" name="退场水费（元）" underline="true"/>
+                            <#input id="trashPrice" name="生活垃圾费（元）" underline="true"/>
+                            <#input id="otherPrice" name="其他费用（元）" underline="true"/>
+                            <#input id="offTimes" name="缺勤未关灯次数" underline="true"/>
+                            <#input id="votes" name="钥匙数量" underline="true"/>
+                            <#input id="memo" name="备注信息" underline="true"/>
+
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="RentTenantShopChangeInfoDlg.addSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="RentTenantShopChangeInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/rentTenantShopChange/rentTenantShopChange_info.js"></script>
+<script>
+    $(function () {
+        var ajax = new $ax(Feng.ctxPath + "/rentTenantSelections/list1", function (data) {
+            var user_list = data;
+            for (var temp in user_list){
+                $("#optionsId").append("<option value='"+user_list[temp].id+"'>"+user_list[temp].options+"</option>");
+            }
+
+        }, function (data) {
+            Feng.error("传参失败!" + data.responseJSON.message + "!");
+        });
+        ajax.start();
+    });
+</script>
+@}

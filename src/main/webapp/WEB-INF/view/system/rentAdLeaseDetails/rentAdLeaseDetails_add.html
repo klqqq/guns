@@ -1,0 +1,42 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <#input id="id" name="记录ID" underline="true"/>
+                            <#input id="bid" name="大楼ID" underline="true"/>
+                            <#input id="fid" name="楼层ID" underline="true"/>
+                            <#input id="adNumber" name="广告位编号" underline="true"/>
+                            <#input id="adId" name="广告位ID" underline="true"/>
+                            <#input id="tenantId" name="租赁商户ID" underline="true"/>
+                            <#input id="realRent" name="广告位实交月租金" underline="true"/>
+                            <#input id="realMargin" name="广告位实交保证金" underline="true"/>
+                            <#input id="realElectricity" name="广告位实交电费单价"/>
+                </div>
+
+                <div class="col-sm-6">
+                            <#input id="deposit" name="押金，可选押3付6和押2付12" underline="true"/>
+                            <#input id="payment" name="付款，可选押3付6和押2付12" underline="true"/>
+                            <#input id="beginedAt" name="广告位起始时间" underline="true"/>
+                            <#input id="endedAt" name="广告位到期时间" underline="true"/>
+                            <#input id="leaseMemo" name="备注信息" underline="true"/>
+                            <#input id="createdAt" name="信息创建时间" underline="true"/>
+                            <#input id="updatedAt" name="信息更新时间" underline="true"/>
+                            <#input id="userId" name="创建人ID" underline="true"/>
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="RentAdLeaseDetailsInfoDlg.addSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="RentAdLeaseDetailsInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/rentAdLeaseDetails/rentAdLeaseDetails_info.js"></script>
+@}

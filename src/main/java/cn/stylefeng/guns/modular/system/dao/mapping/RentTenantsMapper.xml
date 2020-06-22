@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.RentTenantsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.RentTenants">
+        <id column="tenants_id" property="tenantsId" />
+        <result column="name" property="name" />
+        <result column="sex" property="sex" />
+        <result column="mobile" property="mobile" />
+        <result column="card_number" property="cardNumber" />
+        <result column="address" property="address" />
+        <result column="memo" property="memo" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="user_id" property="userId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        tenants_id, name, sex, mobile, card_number, address, memo, created_at, updated_at, user_id
+    </sql>
+
+    <select id="getTenants" resultType="map">
+        select a.tenants_id as tenantsId, a.name, case when a.sex=0 then '女' else '男' end as sex, a.mobile, a.card_number as cardNumber, a.address,
+        a.memo, a.created_at as createdAt, a.updated_at as updatedAt, b.name as userName
+        from rent_tenants a, sys_user b
+        where a.user_id = b.id
+        <if test="condition != null and condition != ''">
+            and a.name like CONCAT('%',#{condition},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (created_at >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= created_at)
+        </if>
+        order by a.created_at
+    </select>
+
+    <insert id="addTenants">
+        insert into rent_tenants(name, sex, mobile, card_number, address, memo, created_at, updated_at, user_id)
+        values(#{name},#{sex},#{mobile},#{cardNumber},#{address},#{memo},#{createdAt},#{updatedAt},#{userId})
+    </insert>
+
+    <update id="setTenants">
+        update rent_tenants set name=#{name},sex=#{sex},mobile=#{mobile},card_number=#{cardNumber},address=#{address},memo=#{memo},updated_at=#{updatedAt}
+        where tenants_id=#{tenantsId}
+    </update>
+
+    <select id="getIdByCardNumber" resultType="Integer">
+        select tenants_id from rent_tenants where card_number=#{cardNumber}
+    </select>
+
+</mapper>

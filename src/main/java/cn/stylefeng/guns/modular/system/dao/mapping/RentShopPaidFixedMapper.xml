@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.RentShopPaidFixedMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.RentShopPaidFixed">
+        <id column="id" property="id" />
+        <result column="tenants_id" property="tenantsId" />
+        <result column="bid" property="bid" />
+        <result column="fid" property="fid" />
+        <result column="shops_number" property="shopsNumber" />
+        <result column="shops_id" property="shopsId" />
+        <result column="memo" property="memo" />
+        <result column="created_at" property="createdAt" />
+        <result column="user_id" property="userId" />
+        <result column="paid_start" property="paidStart" />
+        <result column="paid_end" property="paidEnd" />
+        <result column="voucher" property="voucher" />
+        <result column="receipt" property="receipt" />
+        <result column="account" property="account" />
+        <result column="flag" property="flag" />
+        <result column="contract_fees" property="contractFees" />
+        <result column="contract_margin" property="contractMargin" />
+        <result column="property_margin" property="propertyMargin" />
+        <result column="property_fees" property="propertyFees" />
+        <result column="business_margin" property="businessMargin" />
+        <result column="business_fees" property="businessFees" />
+        <result column="water_margin" property="waterMargin" />
+        <result column="lisense_price" property="lisensePrice" />
+        <result column="fitment_price" property="fitmentPrice" />
+        <result column="garbage_price" property="garbagePrice" />
+        <result column="plate_price" property="platePrice" />
+        <result column="pop_price" property="popPrice" />
+        <result column="off_price" property="offPrice" />
+        <result column="tool_price" property="toolPrice" />
+        <result column="exit_electricity" property="exitElectricity" />
+        <result column="exit_water" property="exitWater" />
+        <result column="ad_margin" property="adMargin" />
+        <result column="ad_rent" property="adRent" />
+        <result column="trash_price" property="trashPrice" />
+        <result column="money_paid" property="moneyPaid" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, tenants_id, bid, fid, shops_number, shops_id, memo, created_at, user_id, paid_start, paid_end, voucher, receipt, account, flag,
+        contract_fees, contract_margin, property_margin, property_fees, business_margin, business_fees, water_margin, lisense_price,
+        fitment_price, garbage_price, plate_price, pop_price, off_price, other_price, tool_price, exit_electricity, exit_water, ad_margin, ad_rent,
+        trash_price, money_paid
+    </sql>
+
+    <select id="getShopFixed" resultType="map">
+        select a.id, a.bid, (select fullname from sys_dept where id=a.bid) as bname ,
+        a.fid, (select simplename from sys_dept where id=a.fid) as fname, a.shops_number as shopsNumber, a.shops_id as shopsId,
+        (select shops_name from rent_shops where bid=a.bid and fid=a.fid and shops_id=a.shops_id) as shopsName,
+        a.tenants_id as tenantsId, (select name from rent_tenants where tenants_id=a.tenants_id) as tenantsName,
+        a.memo, a.created_at as createdAt,
+        a.user_id as userId, (select name from sys_user where id=a.user_id ) as userName,
+        a.paid_start as paidStart, a.paid_end as paidEnd, a.voucher, a.receipt, a.account,
+        case when a.flag=0 then '未缴清' else '已缴清' end as flag,
+        a.contract_fees as contractFees,a.contract_margin as contractMargin,a.property_margin as propertyMargin,a.property_fees as propertyFees,
+        a.business_margin as businessMargin,a.business_fees as businessFees,a.water_margin as waterMargin,a.lisense_price as lisensePrice,
+        a.fitment_price as fitmentPrice, a.garbage_price as garbagePrice, a.plate_price as platePrice, a.pop_price as popPrice, a.off_price as offPrice,
+        a.other_price as otherPrice, a.tool_price as toolPrice, a.exit_electricity as exitElectricity,a.exit_water as exitWater,
+        a.ad_margin as adMargin, a.ad_rent as adRent, a.trash_price as trashPrice,
+        (a.contract_fees+a.contract_margin+a.property_margin+a.property_fees+a.business_margin+a.business_fees+a.water_margin+a.lisense_price
+        +a.fitment_price+a.garbage_price+a.plate_price+a.pop_price+a.off_price+a.other_price+a.tool_price+a.exit_electricity+a.exit_water
+        +a.ad_margin+a.ad_rent+a.trash_price) as total, a.money_paid as moneyPaid
+        from rent_shop_paid_fixed a, sys_user b, rent_shops c
+        where a.bid=c.bid and a.fid=c.fid and a.shops_id=c.shops_id and b.id=c.manage_id and
+        ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))
+        <if test="condition1 != null and condition1 != ''">
+            and (select fullname from sys_dept where id=a.bid) like CONCAT('%',#{condition1},'%')
+        </if>
+        <if test="condition2 != null and condition2 != ''">
+            and (select simplename from sys_dept where id=a.fid) like CONCAT('%',#{condition2},'%')
+        </if>
+        <if test="condition3 != null and condition3 != ''">
+            and (select shops_name from rent_shops where bid=a.bid and fid=a.fid and shops_id=a.shops_id) like CONCAT('%',#{condition3},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.paid_start >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.paid_end)
+        </if>
+        order by a.shops_number, a.flag, a.paid_end desc, a.created_at
+    </select>
+
+    <delete id="deleteShopFixed">
+        delete from rent_shop_paid_fixed where id=#{id}
+    </delete>
+
+    <insert id="addShopFixed">
+        insert into rent_shop_paid_fixed(tenants_id, bid, fid, shops_number, shops_id, memo, created_at, user_id, paid_start, paid_end, voucher, receipt,
+        account, flag, contract_fees, contract_margin, property_margin,property_fees, business_margin, business_fees, water_margin,
+        lisense_price,  fitment_price, garbage_price, plate_price, pop_price, off_price, other_price, tool_price, exit_electricity,
+        exit_water, ad_margin, ad_rent, trash_price, money_paid)
+        values(#{tenantsId},#{bid},#{fid},#{shopsNumber},#{shopsId},#{memo},#{createdAt},#{userId},#{paidStart},#{paidEnd},#{voucher},#{receipt},
+        #{account},#{flag},#{contractFees},#{contractMargin},#{propertyMargin},#{propertyFees},#{businessMargin},#{businessFees},#{waterMargin},
+        #{lisensePrice},#{fitmentPrice},#{garbagePrice},#{platePrice},#{popPrice},#{offPrice},#{otherPrice},#{toolPrice},#{exitElectricity},
+        #{exitWater},#{adMargin},#{adRent},#{trashPrice},#{moneyPaid})
+    </insert>
+
+    <update id="setShopFixed">
+        update rent_shop_paid_fixed set bid=#{bid},fid=#{fid},shops_number=#{shopsNumber},shops_id=#{shopsId},tenants_id=#{tenantsId},memo=#{memo},
+        paid_start=#{paidStart},paid_end=#{paidEnd},voucher=#{voucher}, receipt=#{receipt},account=#{account},flag=#{flag},
+        contract_fees=#{contractFees},contract_margin=#{contractMargin}, property_margin=#{propertyMargin},property_fees=#{propertyFees},
+        business_margin=#{businessMargin},business_fees=#{businessFees},water_margin=#{waterMargin},lisense_price=#{lisensePrice},
+        fitment_price=#{fitmentPrice},garbage_price=#{garbagePrice},plate_price=#{platePrice},pop_price=#{popPrice},
+        off_price=#{offPrice},other_price=#{otherPrice},tool_price=#{toolPrice},exit_electricity=#{exitElectricity},
+        exit_water=#{exitWater},ad_margin=#{adMargin},ad_rent=#{adRent},trash_price=#{trashPrice},money_paid=#{moneyPaid}
+        where id=#{id}
+    </update>
+
+    <select id="getMoney" resultType="map">
+        select sum(a.money_paid) as saleAmount
+        from rent_shop_paid_fixed a, sys_user b, rent_shops c
+        where a.bid=c.bid and a.fid=c.fid and a.shops_id=c.shops_id and b.id=c.manage_id and
+        ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))
+        <if test="condition1 != null and condition1 != ''">
+            and (select fullname from sys_dept where id=a.bid) like CONCAT('%',#{condition1},'%')
+        </if>
+        <if test="condition2 != null and condition2 != ''">
+            and (select simplename from sys_dept where id=a.fid) like CONCAT('%',#{condition2},'%')
+        </if>
+        <if test="condition3 != null and condition3 != ''">
+            and (select shops_name from rent_shops where bid=a.bid and fid=a.fid and shops_id=a.shops_id) like CONCAT('%',#{condition3},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.paid_start >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.paid_end)
+        </if>
+    </select>
+
+    <select id="getTotal" resultType="map">
+        select sum(a.contract_fees+a.contract_margin+a.property_margin+a.property_fees+a.business_margin+a.business_fees+a.water_margin+a.lisense_price
+        +a.fitment_price+a.garbage_price+a.plate_price+a.pop_price+a.off_price+a.other_price+a.tool_price+a.exit_electricity+a.exit_water
+        +a.ad_margin+a.ad_rent+a.trash_price) as totalAmount
+        from rent_shop_paid_fixed a, sys_user b, rent_shops c
+        where a.bid=c.bid and a.fid=c.fid and a.shops_id=c.shops_id and b.id=c.manage_id and
+        ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))
+        <if test="condition1 != null and condition1 != ''">
+            and (select fullname from sys_dept where id=a.bid) like CONCAT('%',#{condition1},'%')
+        </if>
+        <if test="condition2 != null and condition2 != ''">
+            and (select simplename from sys_dept where id=a.fid) like CONCAT('%',#{condition2},'%')
+        </if>
+        <if test="condition3 != null and condition3 != ''">
+            and (select shops_name from rent_shops where bid=a.bid and fid=a.fid and shops_id=a.shops_id) like CONCAT('%',#{condition3},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.paid_start >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.paid_end)
+        </if>
+    </select>
+
+</mapper>

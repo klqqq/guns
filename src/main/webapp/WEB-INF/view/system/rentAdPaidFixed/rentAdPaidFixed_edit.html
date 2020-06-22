@@ -1,0 +1,184 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="rentAdPaidFixedInfoForm">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <input id="id" name="记录ID" value="${item.id}" type="hidden" underline="true"/>
+                            <div id="typehidden" class="form-group" style="display:none">
+                                <#select id="bid" name="大楼"  >
+                                    <option value="0">请选择</option>
+                                </#select>
+                                <input type="hidden" id="typeflag1" value="${bid1}">
+                                <#select id="fid" name="楼层"  >
+                                    <option value="0">请选择</option>
+                                </#select>
+                                <input type="hidden" id="typeflag2" value="${fid1}">
+                                <#select id="adNumber" name="广告位编号"  >
+                                    <option value="0">请选择</option>
+                                </#select>
+                                <input type="hidden" id="typeflag3" value="${adNumber1}">
+                                <input type="button" style="float:right" value="取消" id="cancelbutton" onclick="javascript:hiddentype()" >
+                            </div>
+
+                            <div id="typehidden1" class="form-group" >
+                                <#input id="building" name="大楼" value="${item.bid}" disabled="true" />
+                                <#input id="floor" name="楼层" value="${item.fid}" disabled="true" />
+                                <#input id="AdNumber" name="广告位编号" value="${item.adNumber}" disabled="true" />
+                                <input type="button" style="float:right" value="修改地址" id="editbutton" onclick="javascript:showtype()" >
+
+                            </div>
+                            <input id="adId" name="广告位ID" value="${item.adId}" type="hidden" underline="true"/>
+                            <input id="tenantsId" name="对应租赁商户ID" value="${item.tenantsId}" type="hidden" underline="true"/>
+
+                            <#input id="paidStart" name="缴租期开始时间" value="${item.paidStart}" underline="true"/>
+                            <#input id="paidEnd" name="缴租期结束时间" value="${item.paidEnd}" underline="true"/>
+                            <#input id="voucher" name="凭证" value="${item.voucher}" underline="true"/>
+                            <#input id="receipt" name="收据编号" value="${item.receipt}" underline="true"/>
+                            <#input id="account" name="账户" value="${item.account}" underline="true"/>
+
+                            <#select id="flag" name="是否缴清" value="${item.flag}" underline="true">
+                                <option value="0">未缴清</option>
+                                <option value="1">已缴清</option>
+                            </#select>
+
+                            <div class="form-group"  underline="true">
+                                <label >合同租金</label>
+                            </div>
+                            <div class="form-group"  underline="true">
+                                <div class="col-sm-6">
+                                    <#input id="contractFees" name="应缴" value="${item.contractFees}" underline="true"/>
+                                </div>
+                                <div class="col-sm-6">
+                                    <#input id="contractFeesPaid" name="实缴" value="${item.contractFeesPaid}" underline="true"/>
+                                </div>
+                            </div>
+
+
+                </div>
+
+                <div class="col-sm-6">
+
+                            <div class="form-group"  underline="true">
+                                <label >合同保证金</label>
+                            </div>
+                            <div class="form-group"  underline="true">
+                                <div class="col-sm-6">
+                                    <#input id="contractMargin" name="应缴" value="${item.contractMargin}" underline="true"/>
+                                </div>
+                                <div class="col-sm-6">
+                                    <#input id="contractMarginPaid" name="实缴" value="${item.contractMarginPaid}" underline="true"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group"  underline="true">
+                                <label>物业保证金</label>
+                            </div>
+                            <div class="form-group"  underline="true">
+                                <div class="col-sm-6">
+                                    <#input id="propertyMargin" name="应缴" value="${item.propertyMargin}" underline="true"/>
+                                </div>
+                                <div class="col-sm-6">
+                                    <#input id="propertyMarginPaid" name="实缴" value="${item.propertyMarginPaid}" underline="true"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group"  underline="true">
+                                <label >物业管理费</label>
+                            </div>
+                            <div class="form-group"  underline="true">
+                                <div class="col-sm-6">
+                                    <#input id="propertyFees" name="应缴" value="${item.propertyFees}" underline="true"/>
+                                </div>
+                                <div class="col-sm-6">
+                                    <#input id="propertyFeesPaid" name="实缴" value="${item.propertyFeesPaid}" underline="true"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group"  underline="true">
+                                <label >商业管理保证金</label>
+                            </div>
+                            <div class="form-group"  underline="true">
+                                <div class="col-sm-6">
+                                    <#input id="businessMargin" name="应缴" value="${item.businessMargin}" underline="true"/>
+                                </div>
+                                <div class="col-sm-6">
+                                    <#input id="businessMarginPaid" name="实缴" value="${item.businessMarginPaid}"  underline="true"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group"  underline="true">
+                                <label >商业管理费</label>
+                            </div>
+                            <div class="form-group"  underline="true">
+                                <div class="col-sm-6">
+                                    <#input id="businessFees" name="应缴" value="${item.businessFees}" underline="true"/>
+                                </div>
+                                <div class="col-sm-6">
+                                    <#input id="businessFeesPaid" name="实缴" value="${item.businessFeesPaid}" underline="true"/>
+                                </div>
+                            </div>
+
+                            <div class="form-group"  underline="true">
+                                <label >水电保证金</label>
+                            </div>
+                            <div class="form-group"  underline="true">
+                                <div class="col-sm-6">
+                                    <#input id="waterMargin" name="应缴" value="${item.waterMargin}" underline="true"/>
+                                </div>
+                                <div class="col-sm-6">
+                                    <#input id="waterMarginPaid" name="实缴" value="${item.waterMarginPaid}" underline="true"/>
+                                </div>
+                            </div>
+
+
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="RentAdPaidFixedInfoDlg.editSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="RentAdPaidFixedInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/rentAdPaidFixed/rentAdPaidFixed_info.js"></script>
+<script>
+    laydate.render({
+        elem:'#paidStart',
+        format:'yyyy/MM/dd',
+
+        //  value: 'new Date()',
+
+    })
+    laydate.render({
+        elem:'#paidEnd',
+        format:'yyyy/MM/dd',
+        // value: new Date()',
+
+
+    })
+
+//    $("#bid").val(${item.bid});
+//    $("#fid").val(${item.fid});
+//    $("#adNumber").val(${item.adNumber});
+    $("#flag").val(${item.flag});
+    RentAdPaidFixedInfoDlg.getDept(document.getElementById('building').value);
+    RentAdPaidFixedInfoDlg.getDept1(document.getElementById('floor').value);
+</script>
+<script type="text/javascript">
+
+    function showtype(){
+        document.getElementById('typehidden').style.display="block";
+        document.getElementById('typehidden1').style.display="none";
+    }
+    function hiddentype(){
+        document.getElementById('typehidden').style.display="none";
+        document.getElementById('typehidden1').style.display="block";
+    }
+</script>
+@}

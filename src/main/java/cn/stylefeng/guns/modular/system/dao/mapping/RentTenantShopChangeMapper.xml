@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.RentTenantShopChangeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.RentTenantShopChange">
+        <id column="id" property="id" />
+        <result column="bid" property="bid" />
+        <result column="fid" property="fid" />
+        <result column="shops_number" property="shopsNumber" />
+        <result column="shops_id" property="shopsId" />
+        <result column="tenants_id" property="tenantsId" />
+        <result column="options_id" property="optionsId" />
+        <result column="change_reason" property="changeReason" />
+        <result column="electric_meter" property="electricMeter" />
+        <result column="water_meter" property="waterMeter" />
+        <result column="off_times" property="offTimes" />
+        <result column="votes" property="votes" />
+        <result column="fitment_price" property="fitmentPrice" />
+        <result column="garbage_price" property="garbagePrice" />
+        <result column="plate_price" property="platePrice" />
+        <result column="pop_price" property="popPrice" />
+        <result column="off_price" property="offPrice" />
+        <result column="lisense_price" property="lisensePrice" />
+        <result column="other_price" property="otherPrice" />
+        <result column="memo" property="memo" />
+        <result column="created_at" property="createdAt" />
+        <result column="user_id" property="userId" />
+        <result column="contract_fees" property="contractFees" />
+        <result column="contract_margin" property="contractMargin" />
+        <result column="property_margin" property="propertyMargin" />
+        <result column="property_fees" property="propertyFees" />
+        <result column="business_margin" property="businessMargin" />
+        <result column="business_fees" property="businessFees" />
+        <result column="water_margin" property="waterMargin" />
+        <result column="tool_price" property="toolPrice" />
+        <result column="exit_electricity" property="exitElectricity" />
+        <result column="exit_water" property="exitWater" />
+        <result column="ad_margin" property="adMargin" />
+        <result column="ad_rent" property="adRent" />
+        <result column="trash_price" property="trashPrice" />
+        <result column="electricity_type" property="electricityType" />
+        <result column="electricity_price" property="electricityPrice" />
+        <result column="water_price" property="waterPrice" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, bid, fid, shops_number, shops_id, tenants_id, options_id, change_reason, electric_meter, water_meter, off_times, votes, fitment_price, garbage_price, plate_price, pop_price, off_price, lisense_price, other_price, memo, created_at, user_id,
+        contract_fees, contract_margin, property_margin, property_fees, business_margin, business_fees, water_margin,
+        tool_price, exit_electricity, exit_water, ad_margin, ad_rent, trash_price, electricity_type, electricity_price, water_price
+    </sql>
+
+    <select id="getShopChange" resultType="map">
+        select a.id, a.bid, (select fullname from sys_dept where id=a.bid) as bname ,
+        a.fid, (select simplename from sys_dept where id=a.fid) as fname, a.shops_number as shopsNumber, a.shops_id as shopsId,
+        (select shops_name from rent_shops where bid=a.bid and fid=a.fid and shops_id=a.shops_id) as shopsName,
+        a.tenants_id as tenantsId, (select name from rent_tenants where tenants_id=a.tenants_id) as tenantsName,
+        a.options_id as optionsId, (select options from rent_tenant_selections where id=a.options_id) as options, a.change_reason as changeReason,
+        a.electric_meter as electricMeter, a.water_meter as waterMeter, a.off_times as offTimes, a.votes, a.fitment_price as fitmentPrice,
+        a.garbage_price as garbagePrice, a.plate_price as platePrice, a.pop_price as popPrice, a.off_price as offPrice,
+        a.lisense_price as lisensePrice, a.other_price as otherPrice, a.memo, a.created_at as createdAt,
+        a.user_id as userId, (select name from sys_user where id=a.user_id ) as userName,
+        a.contract_fees as contractFees, a.contract_margin as contractMargin, a.property_margin as propertyMargin,
+        a.property_fees as propertyFees, a.business_margin as businessMargin, a.business_fees as businessFees, a.water_margin as waterMargin,
+        a.tool_price as toolPrice, a.exit_electricity as exitElectricity,a.exit_water as exitWater,
+        a.ad_margin as adMargin, a.ad_rent as adRent, a.trash_price as trashPrice,
+        (a.contract_fees+a.contract_margin+a.property_margin+a.property_fees+a.business_margin+a.business_fees+a.water_margin+a.lisense_price
+        +a.fitment_price+a.garbage_price+a.plate_price+a.pop_price+a.off_price+a.other_price+a.tool_price+a.exit_electricity+a.exit_water
+        +a.ad_margin+a.ad_rent+a.trash_price) as total,
+        case when a.electricity_type=1 then '独立抄表' else '核定用电量' end as electricityType,
+        a.electricity_price as electricityPrice, a.water_price as waterPrice
+        from rent_tenant_shop_change a, sys_user b, rent_shops c
+        where a.bid=c.bid and a.fid=c.fid and a.shops_id=c.shops_id and b.id=c.manage_id and
+        ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))
+        <if test="condition1 != null and condition1 != ''">
+            and (select fullname from sys_dept where id=a.bid) like CONCAT('%',#{condition1},'%')
+        </if>
+        <if test="condition2 != null and condition2 != ''">
+            and (select simplename from sys_dept where id=a.fid) like CONCAT('%',#{condition2},'%')
+        </if>
+        <if test="condition3 != null and condition3 != ''">
+            and (select shops_name from rent_shops where bid=a.bid and fid=a.fid and shops_id=a.shops_id) like CONCAT('%',#{condition3},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.created_at >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.created_at)
+        </if>
+        order by a.shops_number, a.created_at
+    </select>
+
+    <insert id="addShopChange">
+        insert into rent_tenant_shop_change(bid, fid, shops_number, shops_id, tenants_id, options_id, change_reason, electric_meter, water_meter,
+        off_times, votes, fitment_price, garbage_price, plate_price, pop_price, off_price, lisense_price, other_price, memo, created_at, user_id,
+        contract_fees, contract_margin, property_margin, property_fees, business_margin, business_fees, water_margin,
+        tool_price, exit_electricity, exit_water, ad_margin, ad_rent, trash_price, electricity_type, electricity_price, water_price)
+        values(#{bid},#{fid},#{shopsNumber},#{shopsId},#{tenantsId},#{optionsId},#{changeReason},#{electricMeter},#{waterMeter},#{offTimes},#{votes},#{fitmentPrice},
+        #{garbagePrice},#{platePrice},#{popPrice},#{offPrice},#{lisensePrice},#{otherPrice},#{memo},#{createdAt},#{userId},
+        #{contractFees},#{contractMargin},#{propertyMargin},#{propertyFees},#{businessMargin},#{businessFees},#{waterMargin},
+        #{toolPrice},#{exitElectricity},#{exitWater},#{adMargin},#{adRent},#{trashPrice},#{electricityType},#{electricityPrice},#{waterPrice})
+    </insert>
+
+    <update id="setShopChange">
+        update rent_tenant_shop_change set bid=#{bid},fid=#{fid},shops_number=#{shopsNumber},shops_id=#{shopsId},tenants_id=#{tenantsId},options_id=#{optionsId},
+        change_reason=#{changeReason},electric_meter=#{electricMeter},water_meter=#{waterMeter},off_times=#{offTimes},votes=#{votes},fitment_price=#{fitmentPrice},
+        garbage_price=#{garbagePrice},plate_price=#{platePrice},pop_price=#{popPrice},off_price=#{offPrice},lisense_price=#{lisensePrice},other_price=#{otherPrice},
+        memo=#{memo},contract_fees=#{contractFees},contract_margin=#{contractMargin},property_margin=#{propertyMargin},property_fees=#{propertyFees},
+        business_margin=#{businessMargin},business_fees=#{businessFees},water_margin=#{waterMargin},tool_price=#{toolPrice},exit_electricity=#{exitElectricity},
+        exit_water=#{exitWater},ad_margin=#{adMargin},ad_rent=#{adRent},trash_price=#{trashPrice},electricity_type=#{electricityType},electricity_price=#{electricityPrice},
+        water_price=#{waterPrice}
+        where id=#{id}
+    </update>
+
+    <select id="getMoney" resultType="map">
+        select sum(a.contract_fees+a.contract_margin+a.property_margin+a.property_fees+a.business_margin+a.business_fees+a.water_margin+a.lisense_price
+        +a.fitment_price+a.garbage_price+a.plate_price+a.pop_price+a.off_price+a.other_price+a.tool_price+a.exit_electricity+a.exit_water
+        +a.ad_margin+a.ad_rent+a.trash_price) as saleAmount
+        from rent_tenant_shop_change a, sys_user b, rent_shops c
+        where a.bid=c.bid and a.fid=c.fid and a.shops_id=c.shops_id and b.id=c.manage_id and
+        ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))
+        <if test="condition1 != null and condition1 != ''">
+            and (select fullname from sys_dept where id=a.bid) like CONCAT('%',#{condition1},'%')
+        </if>
+        <if test="condition2 != null and condition2 != ''">
+            and (select simplename from sys_dept where id=a.fid) like CONCAT('%',#{condition2},'%')
+        </if>
+        <if test="condition3 != null and condition3 != ''">
+            and (select shops_name from rent_shops where bid=a.bid and fid=a.fid and shops_id=a.shops_id) like CONCAT('%',#{condition3},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.created_at >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.created_at)
+        </if>
+    </select>
+
+</mapper>

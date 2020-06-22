@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.CostMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.Cost">
+        <id column="id" property="id" />
+        <result column="amount" property="amount" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="memo" property="memo" />
+        <result column="user_id" property="userId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, amount, created_at, updated_at, memo, user_id
+    </sql>
+
+    <select id="getCost" resultType="map">
+        select a.id, a.amount, a.created_at as createdAt, a.updated_at as updatedAt, a.memo,
+        a.user_id as userId, (select name from sys_user where id=a.user_id ) as userName
+        from cost a, sys_user b
+        where a.user_id=b.id
+        <if test="condition != null and condition != ''">
+            and a.memo like CONCAT('%',#{condition},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.created_at >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.created_at)
+        </if>
+    </select>
+
+    <insert id="addCost">
+        insert into cost(amount, created_at, updated_at, memo, user_id)
+        values(#{amount},#{createdAt},#{updatedAt},#{memo},#{userId})
+    </insert>
+
+    <update id="setCost">
+        update cost set amount=#{amount},updated_at=#{updatedAt},memo=#{memo} where id=#{id}
+    </update>
+
+</mapper>

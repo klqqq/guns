@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.RentAdPaidFixedMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.RentAdPaidFixed">
+        <id column="id" property="id" />
+        <result column="tenants_id" property="tenantsId" />
+        <result column="bid" property="bid" />
+        <result column="fid" property="fid" />
+        <result column="ad_number" property="adNumber" />
+        <result column="ad_id" property="adId" />
+        <result column="memo" property="memo" />
+        <result column="created_at" property="createdAt" />
+        <result column="user_id" property="userId" />
+        <result column="paid_start" property="paidStart" />
+        <result column="paid_end" property="paidEnd" />
+        <result column="voucher" property="voucher" />
+        <result column="receipt" property="receipt" />
+        <result column="account" property="account" />
+        <result column="flag" property="flag" />
+        <result column="contract_fees" property="contractFees" />
+        <result column="contract_fees_paid" property="contractFeesPaid" />
+        <result column="contract_margin" property="contractMargin" />
+        <result column="contract_margin_paid" property="contractMarginPaid" />
+        <result column="property_margin" property="propertyMargin" />
+        <result column="property_margin_paid" property="propertyMarginPaid" />
+        <result column="property_fees" property="propertyFees" />
+        <result column="property_fees_paid" property="propertyFeesPaid" />
+        <result column="business_margin" property="businessMargin" />
+        <result column="business_margin_paid" property="businessMarginPaid" />
+        <result column="business_fees" property="businessFees" />
+        <result column="business_fees_paid" property="businessFeesPaid" />
+        <result column="water_margin" property="waterMargin" />
+        <result column="water_margin_paid" property="waterMarginPaid" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, tenants_id, bid, fid, ad_number, ad_id, memo, created_at, user_id, paid_start, paid_end, voucher, receipt, account, flag, contract_fees, contract_fees_paid, contract_margin, contract_margin_paid, property_margin, property_margin_paid, property_fees, property_fees_paid, business_margin, business_margin_paid, business_fees, business_fees_paid, water_margin, water_margin_paid
+    </sql>
+
+    <select id="getAdFixed" resultType="map">
+        select a.id, a.bid, (select fullname from sys_dept where id=a.bid) as bname ,
+        a.fid, (select simplename from sys_dept where id=a.fid) as fname, a.ad_number as adNumber, a.ad_id as adId,
+        (select ad_name from rent_ad_bit where bid=a.bid and fid=a.fid and ad_id=a.ad_id) as adName,
+        a.tenants_id as tenantsId, (select name from rent_tenants where tenants_id=a.tenants_id) as tenantsName,
+         a.memo, a.created_at as createdAt,
+        a.user_id as userId, (select name from sys_user where id=a.user_id ) as userName,
+        a.paid_start as paidStart, a.paid_end as paidEnd, a.voucher, a.receipt, a.account,
+        case when a.flag=0 then '未缴清' else '已缴清' end as flag,
+        a.contract_fees as contractFees,a.contract_fees_paid as contractFeesPaid,
+        a.contract_margin as contractMargin, a.contract_margin_paid as contractMarginPaid,
+        a.property_margin as propertyMargin, a.property_margin_paid as propertyMarginPaid,
+        a.property_fees as propertyFees, a.property_fees_paid as propertyFeesPaid,
+        a.business_margin as businessMargin, a.business_margin_paid as businessMarginPaid,
+        a.business_fees as businessFees, a.business_fees_paid as businessFeesPaid,
+        a.water_margin as waterMargin,a.water_margin_paid as waterMarginPaid
+        from rent_ad_paid_fixed a, sys_user b, rent_ad_bit c
+        where a.bid=c.bid and a.fid=c.fid and a.ad_id=c.ad_id and b.id=c.manage_id and
+        ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))
+        <if test="condition1 != null and condition1 != ''">
+            and (select fullname from sys_dept where id=a.bid) like CONCAT('%',#{condition1},'%')
+        </if>
+        <if test="condition2 != null and condition2 != ''">
+            and (select simplename from sys_dept where id=a.fid) like CONCAT('%',#{condition2},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.paid_start >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.paid_end)
+        </if>
+        order by a.flag, a.paid_end desc, a.created_at
+    </select>
+
+    <delete id="deleteAdFixed">
+        delete from rent_ad_paid_fixed where id=#{id}
+    </delete>
+
+    <insert id="addAdFixed">
+        insert into rent_ad_paid_fixed(tenants_id, bid, fid, ad_number, ad_id, memo, created_at, user_id, paid_start, paid_end, voucher, receipt,
+        account, flag, contract_fees, contract_fees_paid, contract_margin, contract_margin_paid, property_margin, property_margin_paid,
+        property_fees, property_fees_paid, business_margin, business_margin_paid, business_fees, business_fees_paid, water_margin, water_margin_paid)
+        values(#{tenantsId},#{bid},#{fid},#{adNumber},#{adId},#{memo},#{createdAt},#{userId},#{paidStart},#{paidEnd},#{voucher},#{receipt},
+        #{account},#{flag},#{contractFees},#{contractFeesPaid},#{contractMargin},#{contractMarginPaid},#{propertyMargin},#{propertyMarginPaid},
+        #{propertyFees},#{propertyFeesPaid},#{businessMargin},#{businessMarginPaid},#{businessFees},#{businessFeesPaid},#{waterMargin},#{waterMarginPaid})
+    </insert>
+
+    <update id="setAdFixed">
+        update rent_ad_paid_fixed set bid=#{bid},fid=#{fid},ad_number=#{adNumber},ad_id=#{adId},tenants_id=#{tenantsId},memo=#{memo},
+        paid_start=#{paidStart},paid_end=#{paidEnd},voucher=#{voucher},receipt=#{receipt},account=#{account},flag=#{flag},
+        contract_fees=#{contractFees},contract_margin=#{contractMargin}, property_margin=#{propertyMargin},property_fees=#{propertyFees},
+        business_margin=#{businessMargin},business_fees=#{businessFees},water_margin=#{waterMargin},
+        contract_fees_paid=#{contractFeesPaid},contract_margin_paid=#{contractMarginPaid},
+        property_margin_paid=#{propertyMarginPaid},property_fees_paid=#{propertyFeesPaid},
+        business_margin_paid=#{businessMarginPaid},business_fees_paid=#{businessFeesPaid},
+        water_margin_paid=#{waterMarginPaid}
+        where id=#{id}
+    </update>
+
+</mapper>

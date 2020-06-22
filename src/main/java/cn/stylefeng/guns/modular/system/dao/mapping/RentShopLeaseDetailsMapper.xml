@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.RentShopLeaseDetailsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.RentShopLeaseDetails">
+        <id column="id" property="id" />
+        <result column="bid" property="bid" />
+        <result column="fid" property="fid" />
+        <result column="shops_number" property="shopsNumber" />
+        <result column="shops_id" property="shopsId" />
+        <result column="tenants_id" property="tenantsId" />
+        <result column="real_rent" property="realRent" />
+        <result column="real_margin" property="realMargin" />
+        <result column="real_electricity" property="realElectricity" />
+        <result column="deposit" property="deposit" />
+        <result column="payment" property="payment" />
+        <result column="begined_at" property="beginedAt" />
+        <result column="ended_at" property="endedAt" />
+        <result column="lease_memo" property="leaseMemo" />
+        <result column="created_at" property="createdAt" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="user_id" property="userId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, bid, fid, shops_number, shops_id, tenants_id, real_rent, real_margin, real_electricity, deposit, payment, begined_at, ended_at, lease_memo, created_at, updated_at, user_id
+    </sql>
+
+    <select id="getShopLease" resultType="map">
+        select a.id, a.tenants_id as tenantsId, (select name from rent_tenants where tenants_id=a.tenants_id) as tenantsName,
+        a.bid, (select fullname from sys_dept where id=a.bid) as bname ,
+        a.fid, (select simplename from sys_dept where id=a.fid) as fname, a.shops_id as shopsId, a.shops_number as shopsNumber,
+        (select shops_name from rent_shops where bid=a.bid and fid=a.fid and shops_id=a.shops_id) as shopsName,
+        a.real_rent as realRent, a.real_margin as realMargin, a.real_electricity as realElectricity,
+        a.deposit, a.payment,CONCAT('押',a.deposit,'付',a.payment) as dap,
+        a.begined_at as beginedAt, a.ended_at as endedAt, a.lease_memo as leaseMemo, a.created_at as createdAt,
+        a.updated_at as updatedAt, a.user_id as userId, (select name from sys_user where id=a.user_id ) as userName
+        from rent_shop_lease_details a, sys_user b, rent_shops c
+        where a.bid=c.bid and a.fid=c.fid and a.shops_id=c.shops_id and b.id=c.manage_id and
+        ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))
+        <if test="condition1 != null and condition1 != ''">
+            and (select fullname from sys_dept where id=a.bid) like CONCAT('%',#{condition1},'%')
+        </if>
+        <if test="condition2 != null and condition2 != ''">
+            and (select simplename from sys_dept where id=a.fid) like CONCAT('%',#{condition2},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.begined_at >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.ended_at)
+        </if>
+        order by a.shops_number, a.created_at
+    </select>
+
+    <delete id="deleteShopLease">
+        delete from rent_shop_lease_details where id=#{id}
+    </delete>
+
+    <insert id="addShopLease">
+        insert into rent_shop_lease_details( bid, fid, shops_number, shops_id, tenants_id, real_rent, real_margin, real_electricity, deposit, payment,
+        begined_at, ended_at, lease_memo, created_at, updated_at, user_id)
+        values(#{bid},#{fid},#{shopsNumber},#{shopsId},#{tenantsId},#{realRent},#{realMargin},#{realElectricity},#{deposit},#{payment},
+        #{beginedAt},#{endedAt},#{leaseMemo},#{createdAt},#{updatedAt},#{userId})
+    </insert>
+
+    <update id="setShopLease">
+        update rent_shop_lease_details set bid=#{bid}, fid=#{fid}, shops_number=#{shopsNumber}, shops_id=#{shopsId}, tenants_id=#{tenantsId}, real_rent=#{realRent},
+        real_margin=#{realMargin}, real_electricity=#{realElectricity}, deposit=#{deposit}, payment=#{payment}, begined_at=#{beginedAt},
+        ended_at=#{endedAt}, lease_memo=#{leaseMemo}, updated_at=#{updatedAt}
+        where id=#{id}
+    </update>
+
+</mapper>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.RentTenantAdChangeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.RentTenantAdChange">
+        <id column="id" property="id" />
+        <result column="bid" property="bid" />
+        <result column="fid" property="fid" />
+        <result column="ad_number" property="adNumber" />
+        <result column="ad_id" property="adId" />
+        <result column="tenants_id" property="tenantsId" />
+        <result column="options_id" property="optionsId" />
+        <result column="change_reason" property="changeReason" />
+        <result column="electric_meter" property="electricMeter" />
+        <result column="water_meter" property="waterMeter" />
+        <result column="off_times" property="offTimes" />
+        <result column="votes" property="votes" />
+        <result column="fitment_price" property="fitmentPrice" />
+        <result column="garbage_price" property="garbagePrice" />
+        <result column="plate_price" property="platePrice" />
+        <result column="pop_price" property="popPrice" />
+        <result column="off_price" property="offPrice" />
+        <result column="lisense_price" property="lisensePrice" />
+        <result column="other_price" property="otherPrice" />
+        <result column="memo" property="memo" />
+        <result column="created_at" property="createdAt" />
+        <result column="user_id" property="userId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, bid, fid, ad_number, ad_id, tenants_id, options_id, change_reason, electric_meter, water_meter, off_times, votes, fitment_price, garbage_price, plate_price, pop_price, off_price, lisense_price, other_price, memo, created_at, user_id
+    </sql>
+
+    <select id="getAdChange" resultType="map">
+        select a.id, a.bid, (select fullname from sys_dept where id=a.bid) as bname ,
+        a.fid, (select simplename from sys_dept where id=a.fid) as fname, a.ad_number as adNumber, a.ad_id,
+        (select ad_name from rent_ad_bit where bid=a.bid and fid=a.fid and ad_id=a.ad_id) as adName,
+        a.tenants_id as tenantsId, (select name from rent_tenants where tenants_id=a.tenants_id) as tenantsName,
+        a.options_id as optionsId, (select options from rent_tenant_selections where id=a.options_id) as options, a.change_reason as changeReason,
+        a.electric_meter as electricMeter, a.water_meter as waterMeter, a.off_times as offTimes, a.votes, a.fitment_price as fitmentPrice,
+        a.garbage_price as garbagePrice, a.plate_price as platePrice, a.pop_price as popPrice, a.off_price as offPrice,
+        a.lisense_price as lisensePrice, a.other_price as otherPrice, a.memo, a.created_at as createdAt,
+        a.user_id as userId, (select name from sys_user where id=a.user_id ) as userName
+        from rent_tenant_ad_change a, sys_user b, rent_ad_bit c
+        where a.bid=c.bid and a.fid=c.fid and a.ad_id=c.ad_id and b.id=c.manage_id and
+        ( #{deptId} = b.deptid or b.deptid in ( select id from sys_dept where pids like CONCAT('%[', #{deptId}, ']%') ))
+        <if test="condition1 != null and condition1 != ''">
+            and (select fullname from sys_dept where id=a.bid) like CONCAT('%',#{condition1},'%')
+        </if>
+        <if test="condition2 != null and condition2 != ''">
+            and (select simplename from sys_dept where id=a.fid) like CONCAT('%',#{condition2},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (a.created_at >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= a.created_at)
+        </if>
+        order by a.created_at
+    </select>
+
+    <insert id="addAdChange">
+        insert into rent_tenant_ad_change(bid, fid, ad_number, ad_id, tenants_id, options_id, change_reason, electric_meter, water_meter,
+        off_times, votes, fitment_price, garbage_price, plate_price, pop_price, off_price, lisense_price, other_price, memo, created_at, user_id)
+        values(#{bid},#{fid},#{adNumber},#{adId},#{tenantsId},#{optionsId},#{changeReason},#{electricMeter},#{waterMeter},#{offTimes},#{votes},#{fitmentPrice},
+        #{garbagePrice},#{platePrice},#{popPrice},#{offPrice},#{lisensePrice},#{otherPrice},#{memo},#{createdAt},#{userId})
+    </insert>
+
+    <update id="setAdChange">
+        update rent_tenant_ad_change set bid=#{bid},fid=#{fid},ad_number=#{adNumber},ad_id=#{adId},tenants_id=#{tenantsId},options_id=#{optionsId},
+        change_reason=#{changeReason},electric_meter=#{electricMeter},water_meter=#{waterMeter},off_times=#{offTimes},votes=#{votes},fitment_price=#{fitmentPrice},
+        garbage_price=#{garbagePrice},plate_price=#{platePrice},pop_price=#{popPrice},off_price=#{offPrice},lisense_price=#{lisensePrice},other_price=#{otherPrice},
+        memo=#{memo}
+        where id=#{id}
+    </update>
+
+</mapper>

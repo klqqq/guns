@@ -1,0 +1,99 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="rentAdContractDetailsInfoForm">
+            <input type="hidden" id="id" value="">
+
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+
+                            <#input id="cardNumber" name="身份证号" underline="true"/>
+
+                            <#select id="bid" name="大楼"  value="">
+                                <!--<option value="0">请选择</option>-->
+                            </#select>
+                            <#select id="fid" name="楼层" value="" >
+                                <!--<option value="0">请选择</option>-->
+                            </#select>
+                            <#select id="adNumber" name="广告位编号" value="" >
+                                <!--<option value="0">请选择</option>-->
+                            </#select>
+
+
+
+
+                            <div class="form-group" underline="true">
+                                <div class="col-sm-6">
+                                    <#input id="deposit" name="押" />
+                                </div>
+                                <div class="col-sm-6">
+                                    <#input id="payment" name="付" />
+                                </div>
+                            </div>
+
+                            <#input id="period" name="缴费次数" underline="true"/>
+
+                            <#select id="rentStatus" name="租赁状态" underline="true">
+                                <option value="1">新租</option>
+                                <option value="2">续租</option>
+                            </#select>
+
+                            <#select id="electricityType" name="电费缴纳类型" underline="true">
+                                <option value="1">独立抄表</option>
+                                <option value="2">核定用电量</option>
+                            </#select>
+                            <#input id="electricityPrice" name="核定电费单价（xx元/月）" underline="true"/>
+                            <#input id="contractFees" name="合同租金（元）" underline="true"/>
+                            <#input id="contractMargin" name="合同保证金（元）" underline="true"/>
+                </div>
+
+                <div class="col-sm-6">
+
+                            <#input id="propertyMargin" name="物业保证金（元）" underline="true"/>
+                            <#input id="propertyFees" name="物业管理费（元）" underline="true"/>
+                            <#input id="businessMargin" name="商业管理保证金（元）" underline="true"/>
+                            <#input id="businessFees" name="商业管理费（元）" underline="true"/>
+                            <#input id="waterMargin" name="水电保证金（元）" underline="true"/>
+
+                            <#input id="beginedAt" name="合同开始时间" underline="true"/>
+                            <#input id="endedAt" name="合同到期时间" underline="true"/>
+
+
+
+                            <#input id="leaseMemo" name="备注信息" underline="true"/>
+
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="RentAdContractDetailsInfoDlg.addSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="RentAdContractDetailsInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/rentAdContractDetails/rentAdContractDetails_info.js"></script>
+<script>
+    laydate.render({
+        elem:'#beginedAt',
+        format:'yyyy/MM/dd',
+
+
+    })
+    laydate.render({
+        elem:'#endedAt',
+        format:'yyyy/MM/dd',
+
+
+    })
+
+</script>
+
+
+
+
+@}

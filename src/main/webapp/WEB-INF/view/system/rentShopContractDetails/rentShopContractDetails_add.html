@@ -1,0 +1,106 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="rentShopContractDetailsInfoForm">
+            <input type="hidden" id="id" value="">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+
+                    <#input id="cardNumber" name="身份证号" underline="true"/>
+
+                    <#select id="bid" name="大楼"  value="">
+                        <!--<option value="0">请选择</option>-->
+                    </#select>
+                    <#select id="fid" name="楼层" value="" >
+                        <!--<option value="0">请选择</option>-->
+                    </#select>
+                    <#select id="shopsNumber" name="商铺编号" value="" >
+                        <!--<option value="0">请选择</option>-->
+                    </#select>
+
+
+
+                    <div class="form-group" underline="true">
+                        <div class="col-sm-6">
+                            <#input id="deposit" name="押" />
+                        </div>
+                        <div class="col-sm-6">
+                            <#input id="payment" name="付" />
+                        </div>
+                    </div>
+
+                    <#input id="period" name="缴费次数" underline="true"/>
+
+
+                    <#select id="rentStatus" name="租赁状态" underline="true">
+                        <option value="1">新租</option>
+                        <option value="2">续租</option>
+                    </#select>
+
+                    <#select id="electricityType" name="电费缴纳类型" underline="true">
+                        <option value="1">独立抄表</option>
+                        <option value="2">核定用电量</option>
+                    </#select>
+                    <#input id="electricityPrice" name="核定电费单价（xx元/月）" underline="true"/>
+                    <#input id="waterPrice" name="核定水费单价（xx元/月）" underline="true"/>
+                    <#input id="contractMargin" name="合同保证金（元）" underline="true"/>
+                    <#input id="propertyMargin" name="物业保证金（元）" underline="true"/>
+                    <#input id="businessMargin" name="商管保证金（元）" underline="true"/>
+                    <#input id="adMargin" name="广告位保证金（元）" underline="true"/>
+                    <#input id="waterMargin" name="水电保证金（元）" underline="true"/>
+                    <#input id="lisensePrice" name="证照押金（元）" underline="true"/>
+                    <#input id="contractFees" name="租金（元）" underline="true"/>
+
+                </div>
+
+                <div class="col-sm-6">
+                    <#input id="propertyFees" name="物业管理费（元）" underline="true"/>
+                    <#input id="businessFees" name="商业管理费（元）" underline="true"/>
+                    <#input id="adRent" name="广告位租金（元）" underline="true"/>
+                    <#input id="fitmentPrice" name="装修押金（元）" underline="true"/>
+                    <#input id="garbagePrice" name="垃圾清运费（元）" underline="true"/>
+                    <#input id="platePrice" name="施工号牌费（元）" underline="true"/>
+                    <#input id="popPrice" name="封场POP费（元）" underline="true"/>
+                    <#input id="offPrice" name="缺勤未关灯罚款（元）" underline="true"/>
+                    <#input id="toolPrice" name="工具费（元）" underline="true"/>
+                    <#input id="exitElectricity" name="退场电费（元）" underline="true"/>
+                    <#input id="exitWater" name="退场水费（元）" underline="true"/>
+                    <#input id="trashPrice" name="生活垃圾费（元）" underline="true"/>
+                    <#input id="otherPrice" name="其他费用（元）" underline="true"/>
+
+                    <#input id="beginedAt" name="合同开始时间" underline="true"/>
+                    <#input id="endedAt" name="合同到期时间" underline="true"/>
+
+
+
+                    <#input id="leaseMemo" name="备注信息" underline="true"/>
+
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="RentShopContractDetailsInfoDlg.addSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="RentShopContractDetailsInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/rentShopContractDetails/rentShopContractDetails_info.js"></script>
+<script>
+    laydate.render({
+        elem:'#beginedAt',
+        format:'yyyy/MM/dd',
+
+
+    })
+    laydate.render({
+        elem:'#endedAt',
+        format:'yyyy/MM/dd',
+
+    })
+</script>
+@}

@@ -1,0 +1,124 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="rentAdContractDetailsInfoForm">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <input id="id" name="合同ID" value="${item.id}" type="hidden" underline="true"/>
+                            <input id="tenantsId" name="租赁商户ID" value="${item.tenantsId}" type="hidden" underline="true"/>
+                            <#input id="cardNumber" name="身份证号" value="${item.cardNumber}" underline="true"/>
+                            <div id="typehidden" class="form-group" style="display:none">
+                                    <#select id="bid" name="大楼"  >
+                                        <option value="0">请选择</option>
+                                    </#select>
+                                <input type="hidden" id="typeflag1" value="${bid1}">
+                                    <#select id="fid" name="楼层"  >
+                                        <option value="0">请选择</option>
+                                    </#select>
+                                <input type="hidden" id="typeflag2" value="${fid1}">
+                                    <#select id="adNumber" name="广告位编号"  >
+                                        <option value="0">请选择</option>
+                                    </#select>
+                                <input type="hidden" id="typeflag3" value="${adNumber1}">
+                                <input type="button" style="float:right" value="取消" id="cancelbutton" onclick="javascript:hiddentype()" >
+                            </div>
+
+                            <div id="typehidden1" class="form-group" >
+                                <#input id="building" name="大楼" value="${item.bid}" disabled="true" />
+                                <#input id="floor" name="楼层" value="${item.fid}" disabled="true" />
+                                <#input id="AdNumber" name="广告位编号" value="${item.adNumber}" disabled="true" />
+
+                                <input type="button" style="float:right" value="修改地址" id="editbutton" onclick="javascript:showtype()" >
+
+                            </div>
+
+                            <input id="adId" name="广告位ID" value="${item.adId}" type="hidden" underline="true"/>
+                            <div class="form-group" underline="true">
+                                <div class="col-sm-6">
+                                    <#input id="deposit" name="押" value="${item.deposit}"/>
+                                </div>
+                                <div class="col-sm-6">
+                                    <#input id="payment" name="付" value="${item.payment}"/>
+                                </div>
+                            </div>
+
+                            <#input id="period" name="缴费次数" value="${item.period}" underline="true"/>
+
+                            <#select id="rentStatus" name="租赁状态" value="${item.rentStatus}" underline="true">
+                                <option value="1">新租</option>
+                                <option value="2">续租</option>
+                            </#select>
+
+                            <#select id="electricityType" name="电费缴纳类型" value="${item.electricityType}" underline="true">
+                                <option value="1">独立抄表</option>
+                                <option value="2">核定用电量</option>
+                            </#select>
+                            <#input id="electricityPrice" name="核定电费单价（xx元/月）" value="${item.electricityPrice}" underline="true"/>
+                            <#input id="contractFees" name="合同租金（元）" value="${item.contractFees}" underline="true"/>
+                            <#input id="contractMargin" name="合同保证金（元）" value="${item.contractMargin}" underline="true"/>
+                </div>
+
+                <div class="col-sm-6">
+
+                            <#input id="propertyMargin" name="物业保证金（元）" value="${item.propertyMargin}" underline="true"/>
+                            <#input id="propertyFees" name="物业管理费（元）" value="${item.propertyFees}" underline="true"/>
+                            <#input id="businessMargin" name="商业管理保证金（元）" value="${item.businessMargin}" underline="true"/>
+                            <#input id="businessFees" name="商业管理费（元）" value="${item.businessFees}" underline="true"/>
+                            <#input id="waterMargin" name="水电保证金（元）" value="${item.waterMargin}" underline="true"/>
+                            <#input id="beginedAt" name="合同开始时间" value="${item.beginedAt}" underline="true" clickFun="laydate({istime: false, format: 'YYYY-MM-DD'})" />
+                            <#input id="endedAt" name="合同到期时间" value="${item.endedAt}" underline="true" clickFun="laydate({istime: false, format: 'YYYY-MM-DD'})" />
+
+                            <#input id="leaseMemo" name="备注信息" value="${item.leaseMemo}" underline="true"/>
+
+
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="RentAdContractDetailsInfoDlg.editSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="RentAdContractDetailsInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/rentAdContractDetails/rentAdContractDetails_info.js"></script>
+<script>
+    laydate.render({
+        elem:'#beginedAt',
+        format:'yyyy/MM/dd',
+
+    })
+    laydate.render({
+        elem:'#endedAt',
+        format:'yyyy/MM/dd',
+
+
+    })
+
+    $("#rentStatus").val(${item.rentStatus});
+    $("#electricityType").val(${item.electricityType});
+
+//    $("#bid").val(${item.bid});
+//    $("#fid").val(${item.fid});
+//    $("#adNumber").val(${item.adNumber});
+
+    RentAdContractDetailsInfoDlg.getDept(document.getElementById('building').value);
+    RentAdContractDetailsInfoDlg.getDept1(document.getElementById('floor').value);
+</script>
+
+<script type="text/javascript">
+
+    function showtype(){
+        document.getElementById('typehidden').style.display="block";
+        document.getElementById('typehidden1').style.display="none";
+    }
+    function hiddentype(){
+        document.getElementById('typehidden').style.display="none";
+        document.getElementById('typehidden1').style.display="block";
+    }
+</script>
+@}

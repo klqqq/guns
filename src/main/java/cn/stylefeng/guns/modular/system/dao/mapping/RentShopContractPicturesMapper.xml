@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.RentShopContractPicturesMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.RentShopContractPictures">
+        <id column="shop_con_id" property="shopConId" />
+        <result column="picture_url" property="pictureUrl" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        shop_con_id, picture_url
+    </sql>
+
+    <select id="getUrl" resultType="map">
+        select shop_con_id as shopConId, picture_url as pictureUrl from rent_shop_contract_pictures where shop_con_id=#{shopConId}
+    </select>
+
+    <insert id="addUrl">
+        insert into rent_shop_contract_pictures(shop_con_id, picture_url) values(#{shopConId}, #{pictureUrl})
+    </insert>
+
+    <delete id="deleteUrl">
+        delete from rent_shop_contract_pictures where shop_con_id=#{shopConId} and picture_url=#{pictureUrl}
+    </delete>
+
+</mapper>

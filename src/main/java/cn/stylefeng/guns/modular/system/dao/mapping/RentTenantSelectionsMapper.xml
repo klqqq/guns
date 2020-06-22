@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.stylefeng.guns.modular.system.dao.RentTenantSelectionsMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.stylefeng.guns.modular.system.model.RentTenantSelections">
+        <id column="id" property="id" />
+        <result column="options" property="options" />
+        <result column="created_at" property="createdAt" />
+        <result column="user_id" property="userId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, options, created_at, user_id
+    </sql>
+
+    <select id="getOptions" resultType="map">
+        select a.id, a.options, a.created_at as createdAt, b.name as userName
+        from rent_tenant_selections a, sys_user b
+        where a.user_id=b.id
+        <if test="condition != null and condition != ''">
+            and a.options like CONCAT('%',#{condition},'%')
+        </if>
+        <if test="beginTime != null and beginTime != ''">
+            and (created_at >= CONCAT(#{beginTime},' 00:00:00'))
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and (CONCAT(#{endTime},' 23:59:59') >= created_at)
+        </if>
+    </select>
+
+
+
+</mapper>

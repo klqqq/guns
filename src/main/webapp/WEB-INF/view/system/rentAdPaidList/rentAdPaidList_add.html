@@ -1,0 +1,60 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="rentAdPaidListInfoForm">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <#select id="bid" name="大楼"  value=""/>
+                            <#select id="fid" name="楼层" value="" />
+                            <#select id="adNumber" name="广告位编号" value="" />
+
+                            <#input id="paidStart" name="缴租期起始时间" underline="true"/>
+                            <#input id="paidEnd" name="缴租起终止时间" underline="true"/>
+
+                            <#select id="flag" name="是否缴清" underline="true">
+                                <option value="0">未缴清</option>
+                                <option value="1">已缴清</option>
+                            </#select>
+                </div>
+
+                <div class="col-sm-6">
+                            <#input id="voucher" name="凭证" underline="true"/>
+                            <#input id="receipt" name="收据单号" underline="true"/>
+                            <#input id="account" name="转入账户" underline="true"/>
+                            <#input id="price" name="应缴纳金额" underline="true"/>
+                            <#input id="paidPrice" name="实缴纳金额" underline="true"/>
+                            <#input id="memo" name="备注信息" underline="true"/>
+
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="RentAdPaidListInfoDlg.addSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="RentAdPaidListInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/rentAdPaidList/rentAdPaidList_info.js"></script>
+<script>
+    laydate.render({
+        elem:'#paidStart',
+        format:'yyyy/MM/dd',
+
+      //  value: 'new Date()',
+
+    })
+    laydate.render({
+        elem:'#paidEnd',
+        format:'yyyy/MM/dd',
+       // value: new Date()',
+
+
+    })
+
+</script>
+@}

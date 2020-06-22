@@ -1,0 +1,152 @@
+@layout("/common/_container.html"){
+<div class="ibox float-e-margins">
+    <div class="ibox-content">
+        <div class="form-horizontal" id="rentAdBitInfoForm">
+            <input type="hidden" id="id" value="">
+            <input type="hidden" id="enamearr" value="${enamearr}">
+            <input type="hidden" id="eparentarr" value="${eparentarr}">
+            <input type="hidden" id="childarr" value="">
+            <input type="hidden" id="childnamearr" value="">
+
+            <div class="row">
+                <div class="col-sm-6 b-r">
+                            <div id="typehidden" class="form-group" style="display:none">
+                                <#select id="bid" name="大楼" onchange="dataChange()">
+                                    <option value="0">请选择</option>
+                                </#select>
+                                <input type="hidden" id="typeflag1" value="${bid1}">
+                                <#select id="fid" name="楼层" >
+                                    <option value="0">请选择</option>
+                                </#select>
+                                <input type="hidden" id="typeflag2" value="${fid1}">
+                                <input type="button" style="float:right" value="取消" id="cancelbutton" onclick="javascript:hiddentype()" >
+                            </div>
+                            <input type="hidden" id="typeflag3" value="${adId1}">
+                            <div id="typehidden1" class="form-group" >
+                                <#input id="building" name="大楼" value="${item.bid}" disabled="true" />
+                                <#input id="floor" name="楼层" value="${item.fid}" disabled="true" />
+                                <input type="button" style="float:right" value="修改地址" id="editbutton" onclick="javascript:showtype()" >
+                                <input type="hidden" id="adId" name="广告位ID" value="${item.adId}" underline="true"/>
+                            </div>
+                            <#input id="adNumber" name="广告位编号" value="${item.adNumber}" underline="true"/>
+                            <#input id="adName" name="广告位名称" value="${item.adName}" underline="true"/>
+                            <#input id="adArea" name="广告位预计面积（m^2）" value="${item.adArea}" underline="true"/>
+                            <#input id="address" name="广告位地址" value="${item.address}" underline="true"/>
+
+
+                </div>
+
+                <div class="col-sm-6">
+                            <#select id="leaseStatus" name="广告位状态" value="" underline="true">
+                                <option value="1">未出租</option>
+                                <option value="2">已出租</option>
+                            </#select>
+                            <input type="hidden" id="flag2" value="${item.leaseStatus}">
+                            <#input id="adRent" name="广告位预算月租金" value="${item.adRent}" underline="true" />
+                            <#input id="adMargin" name="广告位核定保证金" value="${item.adMargin}" underline="true"/>
+                            <#input id="adElectricity" name="广告位核定电费单价" value="${item.adElectricity}" underline="true"/>
+                            <#input id="adMemo" name="备注信息" value="${item.adMemo}" underline="true"/>
+                            <input type="hidden" id="createdAt" name="创建时间" value="${item.createdAt}" underline="true"/>
+                            <input type="hidden" id="updatedAt" name="更新时间" value="${item.updatedAt}" underline="true"/>
+                            <input type="hidden" id="userId" name="创建人ID" value="${item.userId}" underline="true"/>
+                            <#select id="manageId" name="管理人" underline="true" value="${item.manageId}"/>
+
+
+
+                </div>
+            </div>
+
+            <div class="row btn-group-m-t">
+                <div class="col-sm-10">
+                    <#button btnCss="info" name="提交" id="ensure" icon="fa-check" clickFun="RentAdBitInfoDlg.editSubmit()"/>
+                    <#button btnCss="danger" name="取消" id="cancel" icon="fa-eraser" clickFun="RentAdBitInfoDlg.close()"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="${ctxPath}/static/modular/system/rentAdBit/rentAdBit_info.js"></script>
+<script>
+    $(function () {
+        var ajax = new $ax(Feng.ctxPath + "/mgr/userList", function (data) {
+            var user_list = data;
+          //  var manageIdflag =document.getElementById("flag3").value;
+            for (var temp in user_list){
+                $("#manageId").append("<option value='"+user_list[temp].id+"'>"+user_list[temp].name+"</option>");
+               // if(manageIdflag==user_list[temp].name){manageIdflag=user_list[temp].id};
+            }
+            //document.getElementById("manageId").value = manageIdflag;
+
+            $("#manageId").val(${item.manageId})
+
+        }, function (data) {
+            Feng.error("传参失败!" + data.responseJSON.message + "!");
+        });
+        ajax.start();
+    });
+</script>
+<script>
+    var leaseStatusflag =document.getElementById("flag2").value;
+    if(leaseStatusflag=="未出租"){leaseStatusflag=1};
+    if(leaseStatusflag=="已出租"){leaseStatusflag=2};
+    document.getElementById("leaseStatus").value = leaseStatusflag;
+
+    var enamearr=document.getElementById('enamearr').value;
+    var enamearr1 = enamearr.split(",");
+    var eparentarr=document.getElementById('eparentarr').value;
+    var eparentarr1 = eparentarr.split(",");
+    for(i=0;i<eparentarr1.length;i++){
+        eparentarr1[i]=Number(eparentarr1[i]);
+    }
+    for(i=0;i<eparentarr1.length;i++){
+        $("#bid").append("<option value='"+eparentarr1[i]+"'>"+enamearr1[i]+"</option>");
+    }
+
+    window.onload = function () {
+        RentAdBitInfoDlg.getDept(document.getElementById('building').value);
+        RentAdBitInfoDlg.getDept1(document.getElementById('floor').value);
+
+
+        $("#bid").append("<option value='" + document.getElementById("typeflag1").value + "'>" + "请选择" + "</option>");
+
+        document.getElementById("bid").addEventListener('change',function() {
+
+
+            if (this.value == 0) {
+                document.getElementById("fid").options.length = 0;
+
+                $("#fid").append("<option value='" + 0 + "'>" + "请选择" + "</option>");
+
+            }else{
+                document.getElementById("fid").options.length = 0;
+
+                RentAdBitInfoDlg.child(this.value);
+                var childnamearr = document.getElementById('childnamearr').value;
+                var childnamearr1 = childnamearr.split(",");
+                // console.log(childnamearr1);
+                var childarr = document.getElementById('childarr').value;
+                var childarr1 = childarr.split(",");
+                for (i = 0; i < childarr1.length; i++) {
+                    childarr1[i] = Number(childarr1[i]);
+                }
+                for (i = 0; i < childarr1.length; i++) {
+                    $("#fid").append("<option value='" + childarr1[i] + "'>" + childnamearr1[i] + "</option>");
+                }
+            }
+        },true);
+    }
+</script>
+
+<script type="text/javascript">
+
+    function showtype(){
+        document.getElementById('typehidden').style.display="block";
+        document.getElementById('typehidden1').style.display="none";
+    }
+    function hiddentype(){
+        document.getElementById('typehidden').style.display="none";
+        document.getElementById('typehidden1').style.display="block";
+    }
+</script>
+@}
